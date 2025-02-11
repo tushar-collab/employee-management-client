@@ -3,9 +3,12 @@ import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, InputAdornment, TextField, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { InternalDropDown } from "./InternalDropDown";
+import { useDispatch } from "react-redux";
 function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
+
+  const dispatch = useDispatch();
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -13,12 +16,21 @@ function SearchBar() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log("Searching for:", searchTerm);
+    if (category === "All") {
+      dispatch({ type: "FREE_SEARCH", payload: { name: searchTerm } });
+    } else if (category === "First Name") {
+      dispatch({ type: "FIRST_NAME_SEARCH", payload: { name: searchTerm } });
+    } else if (category === "Last Name") {
+      dispatch({ type: "LAST_NAME_SEARCH", payload: { name: searchTerm } });
+    } else {
+      dispatch({ type: "SSN_SEARCH", payload: { name: searchTerm } });
+    }
   };
 
   const handleReset = () => {
     setSearchTerm("");
     setCategory("All");
+    dispatch({ type: "FETCH_USERS" });
   };
 
   const handleCategoryChange = (event) => {
@@ -42,10 +54,20 @@ function SearchBar() {
         variant="outlined"
         placeholder="Search"
         fullWidth
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && searchTerm.length > 2) {
+            handleSubmit(e);
+          } else if (searchTerm.length === 0) {
+            handleReset();
+          }
+        }}
         InputProps={{
           startAdornment: (
             <InputAdornment position="start" style={{ marginLeft: -15 }}>
-              <InternalDropDown handleCategoryChange={handleCategoryChange} category={category}/>
+              <InternalDropDown
+                handleCategoryChange={handleCategoryChange}
+                category={category}
+              />
             </InputAdornment>
           ),
           endAdornment: (
