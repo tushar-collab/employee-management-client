@@ -1,30 +1,24 @@
 import { createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  userApiStatus: false,
   usersData: [],
   isUserGridLoading: false,
   userDetails: {},
-  isUserDetailsLoading: false,
   selectedUser: [],
   openDetails: false,
+  setupStatus: false,
+  setUpMessage: "",
 };
 
 const appSlice = createSlice({
   name: "app",
   initialState,
   reducers: {
-    setUserApiStatus: (state, action) => {
-      state.userApiStatus = action.payload;
-    },
     setUsersData: (state, action) => {
       state.usersData = action.payload;
     },
     setIsUserGridLoading: (state, action) => {
       state.isUserGridLoading = action.payload;
-    },
-    setIsUserDetailsLoading: (state, action) => {
-      state.isUserDetailsLoading = action.payload;
     },
     setUserDetails: (state, action) => {
       state.userDetails = action.payload;
@@ -41,17 +35,23 @@ const appSlice = createSlice({
         state.selectedUser = [];
       }
     },
+    setSetupStatus: (state, action) => {
+      state.setupStatus = action.payload;
+    },
+    setSetUpMessage: (state, action) => {
+      state.setUpMessage = action.payload;
+    },
   },
 });
 
 export const {
-  setUserApiStatus,
   setUsersData,
   setIsUserGridLoading,
   setUserDetails,
-  setIsUserDetailsLoading,
   setSelectedUser,
   setOpenDetails,
+  setSetupStatus,
+  setSetUpMessage,
 } = appSlice.actions;
 
 export default appSlice.reducer;

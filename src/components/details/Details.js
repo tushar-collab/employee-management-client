@@ -14,34 +14,55 @@ const Details = () => {
 
   return (
     <div>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-between",
-          padding: "0 10px 0 10px",
-          alignItems: "center",
-        }}
-      >
-        <Image
-          src={userDetails?.image}
-          alt={userDetails?.firstName}
-          height="10%"
-          width="10%"
-        />
-        <Typography variant="h5" gutterBottom>
-          {userDetails?.firstName} {userDetails?.maidenName}{" "}
-          {userDetails?.lastName}
-        </Typography>
-      </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "1rem" }}>
-        <CommonDetails />
-        <AddressDetails />
-        <BioLogicalDetails />
-        <BankDetails />
-        <WorkDetails />
-        <CryptoDetails />
-      </div>
+      {Object.keys(userDetails)?.length === 0 ? (
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "row",
+          }}
+        >
+          <Typography variant="h6" color="error">
+            User details not available. Please try again later.
+          </Typography>
+        </div>
+      ) : (
+        <>
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "space-between",
+              padding: "0 10px 0 10px",
+              alignItems: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                height: "18vh",
+              }}
+            >
+              <Image src={userDetails?.image} alt={userDetails?.firstName} />
+            </div>
+            <Typography variant="h5" gutterBottom>
+              {userDetails?.firstName} {userDetails?.maidenName}{" "}
+              {userDetails?.lastName}
+            </Typography>
+          </div>
+          <div
+            style={{ display: "flex", flexDirection: "column", gap: "1rem" }}
+          >
+            <CommonDetails />
+            <AddressDetails />
+            <BioLogicalDetails />
+            <BankDetails />
+            <WorkDetails />
+            <CryptoDetails />
+          </div>
+        </>
+      )}
     </div>
   );
 };
