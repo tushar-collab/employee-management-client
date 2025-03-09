@@ -2,8 +2,7 @@ import * as React from "react";
 import Box from "@mui/material/Box";
 import { DataGrid } from "@mui/x-data-grid";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
-import { gridSkeleton } from "./gridSkeleton";
-import { Skeleton, Tooltip } from "@mui/material";
+import { Tooltip } from "@mui/material";
 import { setSelectedUser } from "../redux/reducer/appSlice";
 
 const columns = [
@@ -101,12 +100,10 @@ const columns = [
 export default function UserDataGrid() {
   const [gridRef, setGridRef] = React.useState(null);
 
-  const { usersData, selectedUser, isUserGridLoading } = useSelector(
+  const { usersData, selectedUser } = useSelector(
     (state) => ({
       usersData: state?.app?.usersData || [],
-
       selectedUser: state?.app?.selectedUser || [],
-      isUserGridLoading: state?.app?.isUserGridLoading || false,
     }),
     shallowEqual
   );
@@ -132,12 +129,8 @@ export default function UserDataGrid() {
       <DataGrid
         gridReference={gridReference}
         columnVisibilityModel={{ id: false }}
-        rows={
-          isUserGridLoading
-            ? Array.from({ length: 5 }, (_, index) => ({ id: index }))
-            : usersData
-        }
-        columns={gridSkeleton(columns, isUserGridLoading)}
+        rows={usersData}
+        columns={columns}
         initialState={{
           pagination: {
             paginationModel: {

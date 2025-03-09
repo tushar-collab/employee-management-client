@@ -3,12 +3,19 @@ import SearchIcon from "@mui/icons-material/Search";
 import { IconButton, InputAdornment, TextField, Tooltip } from "@mui/material";
 import React, { useState } from "react";
 import { InternalDropDown } from "./InternalDropDown";
-import { useDispatch } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 function SearchBar() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("All");
 
   const dispatch = useDispatch();
+
+  const { setupStatus } = useSelector(
+    (state) => ({
+      setupStatus: state.app.setupStatus,
+    }),
+    shallowEqual
+  );
 
   const handleSearch = (event) => {
     setSearchTerm(event.target.value);
@@ -16,21 +23,23 @@ function SearchBar() {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    let payload = {};
     if (category === "All") {
-      dispatch({ type: "FREE_SEARCH", payload: { name: searchTerm } });
+      payload = { name: searchTerm, searchType: "All" };
     } else if (category === "First Name") {
-      dispatch({ type: "FIRST_NAME_SEARCH", payload: { name: searchTerm } });
+      payload = { name: searchTerm, searchType: "Fname" };
     } else if (category === "Last Name") {
-      dispatch({ type: "LAST_NAME_SEARCH", payload: { name: searchTerm } });
+      payload = { name: searchTerm, searchType: "Lname" };
     } else {
-      dispatch({ type: "SSN_SEARCH", payload: { name: searchTerm } });
+      payload = { name: searchTerm, searchType: "Ssn" };
     }
+    dispatch({ type: "DO_SEARCH", payload: payload });
   };
 
   const handleReset = () => {
     setSearchTerm("");
     setCategory("All");
-    dispatch({ type: "FETCH_USERS" });
+    dispatch({ type: "DO_SEARCH", payload: {} });
   };
 
   const handleCategoryChange = (event) => {
@@ -49,6 +58,7 @@ function SearchBar() {
       }}
     >
       <TextField
+        disabled={!setupStatus}
         value={searchTerm}
         onChange={handleSearch}
         variant="outlined"
@@ -57,8 +67,6 @@ function SearchBar() {
         onKeyDown={(e) => {
           if (e.key === "Enter" && searchTerm.length > 2) {
             handleSubmit(e);
-          } else if (searchTerm.length === 0) {
-            handleReset();
           }
         }}
         InputProps={{
@@ -95,27 +103,33 @@ function SearchBar() {
                   <SearchIcon />
                 </IconButton>
               </Tooltip>
+              <Tooltip title="Clear">
+                <IconButton
+                  type="reset"
+                  onClick={handleReset}
+                  disabled={
+                    searchTerm === "" || searchTerm.length < 3 ? true : false
+                  }
+                  style={{
+                    color:
+                      searchTerm === "" || searchTerm.length < 3
+                        ? "grey"
+                        : "#03A9F4",
+                    "&:hover": {
+                      color:
+                        searchTerm === "" || searchTerm.length < 3
+                          ? "grey"
+                          : "#01579B",
+                    },
+                  }}
+                >
+                  <RestartAltIcon />
+                </IconButton>
+              </Tooltip>
             </InputAdornment>
           ),
         }}
       />
-      <Tooltip title="Clear">
-        <IconButton
-          type="reset"
-          onClick={handleReset}
-          disabled={searchTerm === "" || searchTerm.length < 3 ? true : false}
-          style={{
-            color:
-              searchTerm === "" || searchTerm.length < 3 ? "grey" : "#03A9F4",
-            "&:hover": {
-              color:
-                searchTerm === "" || searchTerm.length < 3 ? "grey" : "#01579B",
-            },
-          }}
-        >
-          <RestartAltIcon />
-        </IconButton>
-      </Tooltip>
     </div>
   );
 }

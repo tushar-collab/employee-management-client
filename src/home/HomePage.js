@@ -1,22 +1,40 @@
 import React, { useEffect, useRef } from "react";
 import SearchBar from "../components/SearchBar";
 import UserDataGrid from "../components/UserDataGrid";
-import { useDispatch, useSelector } from "react-redux";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import Details from "../components/details/Details";
-import { Button } from "@mui/material";
+import { Button, CircularProgress, Typography } from "@mui/material";
 import { setOpenDetails } from "../redux/reducer/appSlice";
 
 export const HomePage = () => {
   const dispatch = useDispatch();
 
-  const openDetails = useSelector((state) => state?.app?.openDetails);
-  const userDetails = useSelector((state) => state?.app?.userDetails);
+  const {
+    openDetails,
+    userDetails,
+    setUpMessage,
+    setupStatus,
+    isUserGridLoading,
+  } = useSelector(
+    (state) => ({
+      openDetails: state.app.openDetails,
+      userDetails: state.app.userDetails,
+      setUpMessage: state.app.setUpMessage,
+      setupStatus: state.app.setupStatus,
+      isUserGridLoading: state.app.isUserGridLoading,
+    }),
+    shallowEqual
+  );
 
   const scrollRef = useRef();
 
   useEffect(() => {
-    fetchUsers();
+    doInitialSetup();
   }, []);
+
+  useEffect(() => {
+    if (setupStatus) fetchUsers();
+  }, [setupStatus]);
 
   useEffect(() => {
     if (openDetails && userDetails && scrollRef?.current) {
@@ -24,12 +42,12 @@ export const HomePage = () => {
     }
   }, [userDetails]);
 
-  const loadUsers = () => {
-    dispatch({ type: "LOAD_USERS" });
+  const fetchUsers = () => {
+    dispatch({ type: "DO_SEARCH", payload: {} });
   };
 
-  const fetchUsers = () => {
-    dispatch({ type: "FETCH_USERS" });
+  const doInitialSetup = () => {
+    dispatch({ type: "DO_INITIAL_SETUP" });
   };
 
   return (
@@ -46,7 +64,7 @@ export const HomePage = () => {
         style={{
           textAlign: "center",
           fontFamily: "Poppins, sans-serif",
-          color: "#007bff", 
+          color: "#007bff",
         }}
       >
         <h1>Advanced User Details</h1>
@@ -55,18 +73,68 @@ export const HomePage = () => {
         <SearchBar />
       </div>
       <div style={{ paddingTop: "2rem" }}>
-        <UserDataGrid />
+        {!setupStatus ? (
+          setUpMessage ? (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "15vh",
+                gap: "10px",
+              }}
+            >
+              <Typography variant="h6" color="error">
+                Failed to setup the application, please contact the admin.
+              </Typography>
+            </div>
+          ) : (
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                flexDirection: "column",
+                alignItems: "center",
+                padding: "15vh",
+                gap: "10px",
+              }}
+            >
+              <CircularProgress />
+              <Typography variant="h6">
+                Getting the things ready, please wait...
+              </Typography>
+            </div>
+          )
+        ) : !isUserGridLoading ? (
+          <UserDataGrid />
+        ) : (
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              flexDirection: "column",
+              alignItems: "center",
+              padding: "15vh",
+              gap: "10px",
+            }}
+          >
+            <CircularProgress />
+            <Typography variant="h6">
+              Fetching user data, please wait...
+            </Typography>
+          </div>
+        )}
       </div>
       <div ref={scrollRef}>
         {openDetails && (
           <React.Fragment>
             <div
               style={{
-                marginTop: "1rem",
                 display: "flex",
                 flexDirection: "row",
                 justifyContent: "center",
-                marginTop: "1rem",
+                marginTop: "2rem",
                 width: "100%",
               }}
             >
@@ -80,7 +148,7 @@ export const HomePage = () => {
             <div style={{ paddingTop: "1.5rem" }} id="details-section">
               <Details />
             </div>
-            <div>
+            <div style={{ display: "flex", justifyContent: "center" }}>
               <Button
                 variant="contained"
                 onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
