@@ -14,7 +14,7 @@ const Details = () => {
 
   return (
     <div>
-      {Object.keys(userDetails)?.length === 0 ? (
+      {Object?.keys(userDetails)?.length === 0 ? (
         <div
           style={{
             display: "flex",
