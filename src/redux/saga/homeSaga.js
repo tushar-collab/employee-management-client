@@ -40,6 +40,8 @@ function* workerForSearchData(action, signal) {
     });
     if (jsonResponse?.data?.success === true) {
       yield put(setUsersData(jsonResponse?.data?.data));
+    }else{
+      yield put(setUsersData([]));
     }
   } catch (error) {
     console.error(error);
